@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Francisco Yuki Ishikiriyama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:      #f2ede6;
+    --surface: #e9e2d6;
+    --line:    #d8cfc0;
+    --text:    #2b2622;
+    --muted:   #6b6357;
+    --accent:  #9c4a3c;
+    --accent-soft: #e3c9c0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  a { color: inherit; }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .wordmark span { color: var(--accent); }
+  nav ul { list-style: none; display: flex; gap: 22px; }
+  nav a.nav-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  nav a.nav-link:hover { color: var(--text); }
+  nav a.nav-link.active { color: var(--accent); border-color: var(--accent); }
+
+  /* ─── HERO / GRAPH ─── */
+  #hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+  }
+  #graph-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  #hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, transparent 0%, var(--bg) 78%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 2; padding: 120px 0 80px; }
+
+  .dot { width: 7px; height: 7px; background: var(--accent); flex: none; }
+
+  h1 {
+    font-weight: 800;
+    font-size: clamp(38px, 6.4vw, 66px);
+    line-height: 1.04;
+    letter-spacing: -.02em;
+  }
+
+  .hero-tagline {
+    margin-top: 22px;
+    font-size: 16.5px;
+    color: var(--muted);
+    max-width: 56ch;
+    line-height: 1.8;
+  }
+
+  .hero-cta { margin-top: 34px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 26px;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-decoration: none;
+    background: var(--accent);
+    color: var(--bg);
+    border: 1px solid var(--accent);
+    transition: background .2s, color .2s;
+  }
+  .btn:hover { background: transparent; color: var(--accent); }
+  .plain-link { color: var(--accent); font-size: 14.5px; text-decoration: underline; text-underline-offset: 3px; }
+  .plain-link:hover { text-decoration-thickness: 2px; }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 76px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+  .section-head .dot { width: 8px; height: 8px; }
+  .section-head h2 { font-size: 22px; font-weight: 700; }
+
+  /* ─── ABOUT ─── */
+  .about-text { max-width: 68ch; font-size: 16px; color: var(--muted); line-height: 1.85; }
+  .about-text p + p { margin-top: 16px; }
+  .about-text strong { color: var(--text); font-weight: 600; }
+
+  /* ─── EDUCATION & EXPERIENCE (shared list) ─── */
+  .timeline { display: flex; flex-direction: column; gap: 28px; }
+  .t-item { display: grid; grid-template-columns: 130px 1fr; gap: 20px; }
+  .t-date { font-size: 13.5px; color: var(--muted); padding-top: 3px; }
+  .t-role { font-weight: 700; font-size: 16px; }
+  .t-org { color: var(--accent); font-size: 14px; margin-top: 2px; }
+  .t-desc { font-size: 14.5px; color: var(--muted); line-height: 1.8; margin-top: 8px; max-width: 58ch; }
+
+  /* ─── STACK ─── */
+  .stack-groups { display: flex; flex-direction: column; gap: 22px; }
+  .stack-group-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    font-size: 13px;
+    padding: 6px 13px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  /* ─── PROJECTS ─── */
+  .proj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .proj-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 26px;
+    transition: border-color .18s;
+  }
+  .proj-card:hover { border-color: var(--accent); }
+  .proj-cat { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .proj-name { font-weight: 700; font-size: 17px; text-decoration: none; color: var(--text); }
+  a.proj-name:hover { color: var(--accent); }
+  .proj-desc { font-size: 14px; color: var(--muted); line-height: 1.75; margin: 10px 0 14px; }
+  .proj-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .proj-tools span {
+    font-size: 11.5px;
+    padding: 3px 9px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+
+  /* ─── CONTACT ─── */
+  .contact-heading { font-weight: 800; font-size: clamp(26px, 3.6vw, 36px); line-height: 1.3; max-width: 26ch; }
+  .contact-sub { margin-top: 14px; color: var(--muted); font-size: 15px; max-width: 52ch; line-height: 1.8; }
+  .contact-links { margin-top: 28px; display: flex; gap: 26px; flex-wrap: wrap; }
+  .contact-links a { color: var(--accent); font-size: 15px; text-decoration: underline; text-underline-offset: 3px; }
+  .contact-links a:hover { text-decoration-thickness: 2px; }
+
+  /* ─── FOOTER ─── */
+  footer { padding: 26px 0 44px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-inner > * { animation: rise .7s ease both; }
+  .hero-inner > *:nth-child(2) { animation-delay: .08s; }
+  .hero-inner > *:nth-child(3) { animation-delay: .16s; }
+  .hero-inner > *:nth-child(4) { animation-delay: .24s; }
+  .hero-inner > *:nth-child(5) { animation-delay: .32s; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-inner > * { animation: none; }
+  }
+
+  @media (max-width: 680px) {
+    .proj-grid { grid-template-columns: 1fr; }
+    .t-item { grid-template-columns: 1fr; gap: 4px; }
+    nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hero" class="wordmark">yuki<span>.</span></a>
+  <ul>
+    <li><a class="nav-link" href="#about">sobre</a></li>
+    <li><a class="nav-link" href="#education">formação</a></li>
+    <li><a class="nav-link" href="#experience">experiência</a></li>
+    <li><a class="nav-link" href="#stack">stack</a></li>
+    <li><a class="nav-link" href="#projects">projetos</a></li>
+    <li><a class="nav-link" href="#contact">contato</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="graph-canvas"></canvas>
+  <div class="wrap hero-inner">
+    <h1>Francisco Yuki<br>Ishikiriyama</h1>
+    <p class="hero-tagline">
+      Moro em Dourados, MS, curso Engenharia de Computação na UFGD e lidero a parte técnica da
+      LexiGraph, construindo grafos de conhecimento terminológico para o português brasileiro.
+      No tempo livre mantenho um home server com um assistente de voz próprio. Disponível para
+      novos projetos.
+    </p>
+    <div class="hero-cta">
+      <a href="mailto:yukiishikiriyama@gmail.com" class="btn">Contato</a>
+      <a href="#projects" class="plain-link">Ver projetos</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Sobre</h2></div>
+    <div class="about-text">
+      <p>
+        Tenho 19 anos e curso <strong>Engenharia de Computação na UFGD</strong>. Lidero sozinho toda a
+        parte técnica da <strong>LexiGraph</strong>: infraestrutura, pesquisa e pipeline de extração,
+        construindo Grafos de Conhecimento Terminológico para o português brasileiro integrados a LLMs
+        via GraphRAG.
+      </p>
+      <p>
+        Fui bolsista de pesquisa do <strong>CNPq</strong> em redes de computadores aplicadas na UFGD.
+        Antes disso, fui Arquiteto de IA na <strong>Econect</strong>, projetando soluções de IA para
+        contratos e licitações públicas.
+      </p>
+      <p>
+        No tempo livre mantenho o <strong>Obsidian</strong>, meu home server: stack de mídia via Docker,
+        dashboard de monitoramento próprio em Node.js, rede privada via Tailscale e SSH protegido por
+        fail2ban. Tudo isso é narrado por <strong>Wadsworth</strong>, um assistente com LLM local e voz
+        de mordomo britânico, que também executa ações reais no servidor mediante confirmação. Teoria
+        harmônica, Arch Linux e estética solarpunk transhumanista completam a lista de obsessões.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Formação</h2></div>
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-date">em andamento</div>
+        <div>
+          <div class="t-role">Engenharia de Computação</div>
+          <div class="t-org">UFGD</div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-date">concluído</div>
+        <div>
+          <div class="t-role">Técnico em Desenvolvimento de Sistemas</div>
+          <div class="t-org">IFMS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Experiência</h2></div>
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-date">2026–presente</div>
+        <div>
+          <div class="t-role">Tech Lead &amp; Responsável Técnico</div>
+          <div class="t-org">LexiGraph</div>
+          <div class="t-desc">
+            Responsável único pela infraestrutura, pesquisa e integração com LLMs. Construção de Grafos
+            de Conhecimento Terminológico para o PT-BR com pipeline GraphRAG. Candidatura à Chamada
+            Centelha em andamento.
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-date">mar–mai 2025</div>
+        <div>
+          <div class="t-role">Arquiteto de IA</div>
+          <div class="t-org">Econect</div>
+          <div class="t-desc">
+            Projetou soluções de IA para contratos públicos: definição de arquitetura, prototipagem de
+            modelos e integração com sistemas legados de licitação.
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-date">jan 2024–mar 2025</div>
+        <div>
+          <div class="t-role">Estagiário Administrativo</div>
+          <div class="t-org">Ministério Público de Mato Grosso do Sul</div>
+          <div class="t-desc">
+            Suporte administrativo em rotinas internas, comunicação institucional e organização
+            documental.
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-date">out 2023–fev 2024</div>
+        <div>
+          <div class="t-role">Pesquisador, Bolsista CNPq</div>
+          <div class="t-org">CNPq</div>
+          <div class="t-desc">
+            Pesquisa científica júnior com a plataforma Arduino aplicada ao ensino de Redes de
+            Computadores no ensino profissional tecnológico.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Stack</h2></div>
+    <div class="stack-groups">
+      <div>
+        <div class="stack-group-label">Linguagens</div>
+        <div class="pills">
+          <span class="pill">Python</span><span class="pill">JavaScript</span><span class="pill">Dart</span><span class="pill">Java</span><span class="pill">Bash</span>
+        </div>
+      </div>
+      <div>
+        <div class="stack-group-label">IA &amp; LLMs</div>
+        <div class="pills">
+          <span class="pill">LLM de inferência local</span><span class="pill">MoE</span><span class="pill">LangChain</span><span class="pill">GraphRAG</span><span class="pill">Embeddings / RAG</span><span class="pill">Prompt engineering</span>
+        </div>
+      </div>
+      <div>
+        <div class="stack-group-label">Grafos &amp; Dados</div>
+        <div class="pills">
+          <span class="pill">Neo4j</span><span class="pill">Cypher</span><span class="pill">MySQL/MariaDB</span><span class="pill">Ontologias</span><span class="pill">NLP terminológico</span>
+        </div>
+      </div>
+      <div>
+        <div class="stack-group-label">Infra &amp; DevOps</div>
+        <div class="pills">
+          <span class="pill">Docker &amp; Compose</span><span class="pill">Tailscale</span><span class="pill">systemd</span><span class="pill">fail2ban</span><span class="pill">Nginx</span><span class="pill">Arch/Ubuntu</span>
+        </div>
+      </div>
+      <div>
+        <div class="stack-group-label">Frontend</div>
+        <div class="pills">
+          <span class="pill">React</span><span class="pill">Next.js</span><span class="pill">Node.js</span><span class="pill">REST APIs</span>
+        </div>
+      </div>
+      <div>
+        <div class="stack-group-label">Outras</div>
+        <div class="pills">
+          <span class="pill">Pesquisa aplicada</span><span class="pill">Escrita técnica</span><span class="pill">Liderança técnica</span><span class="pill">Pensamento sistêmico</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Projetos</h2></div>
+    <div class="proj-grid">
+
+      <div class="proj-card">
+        <div class="proj-cat">Assistente doméstico, código aberto</div>
+        <a class="proj-name" href="https://github.com/T-Zer0y/wadsworth" target="_blank" rel="noopener">Wadsworth ↗</a>
+        <div class="proj-desc">
+          Observa serviços Docker, downloads e eventos de segurança do meu home server, e narra tudo em
+          voz de mordomo britânico através de um LLM local e síntese de voz (Piper). Também executa
+          ações reais a partir de linguagem natural, como reiniciar um serviço, buscar um livro ou pausar
+          um torrent, sempre com confirmação explícita para qualquer ação destrutiva.
+        </div>
+        <div class="proj-tools"><span>Node.js</span><span>LLM local</span><span>Piper</span><span>ntfy</span></div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-cat">Home server, em produção contínua</div>
+        <div class="proj-name">Obsidian</div>
+        <div class="proj-desc">
+          Servidor doméstico self-hosted com stack de mídia via Docker, dashboard de monitoramento
+          próprio em Node.js com alertas push, rede privada via Tailscale e acesso SSH protegido por
+          fail2ban. É nele que o Wadsworth roda.
+        </div>
+        <div class="proj-tools"><span>Docker</span><span>Tailscale</span><span>systemd</span><span>fail2ban</span></div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-cat">Aplicação desktop, em produção</div>
+        <div class="proj-name">SGU</div>
+        <div class="proj-desc">
+          Sistema desktop em Python para operação de caixa e gerência, com banco MySQL/MariaDB
+          compartilhado entre máquinas na rede local. Inclui scripts de instalação assistida e hardening
+          de produção para deployment em Windows e Linux.
+        </div>
+        <div class="proj-tools"><span>Python</span><span>Tkinter</span><span>MySQL/MariaDB</span></div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-cat">Startup, em desenvolvimento</div>
+        <div class="proj-name">LexiGraph</div>
+        <div class="proj-desc">
+          Grafos de Conhecimento Terminológico para o português brasileiro integrados a LLMs via
+          GraphRAG, com pipeline de extração, modelagem ontológica e consulta semântica.
+        </div>
+        <div class="proj-tools"><span>Neo4j</span><span>GraphRAG</span><span>Python</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head"><span class="dot"></span><h2>Contato</h2></div>
+    <div class="contact-heading">Vamos construir alguma coisa que realmente funcione.</div>
+    <p class="contact-sub">
+      Aberto a colaborações em pesquisa, IA aplicada, infraestrutura, ou uma boa conversa técnica.
+    </p>
+    <div class="contact-links">
+      <a href="mailto:yukiishikiriyama@gmail.com">e-mail</a>
+      <a href="https://github.com/T-Zer0y" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/yuki-ishikiriyama-7018a9192/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Francisco Yuki Ishikiriyama</span>
+    <span>Dourados, MS, Brasil</span>
+  </div>
+</footer>
+
+<script>
+  // Nav + section wayfinding
+  const sections = document.querySelectorAll('section[id]');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const link = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+      if (!link) return;
+      link.classList.toggle('active', entry.isIntersecting);
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach((s) => io.observe(s));
+
+  // Living knowledge-graph background
+  const canvas = document.getElementById('graph-canvas');
+  const ctx = canvas.getContext('2d');
+  const hero = document.getElementById('hero');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let w, h, nodes;
+  const NODE_COUNT = 46;
+  const LINK_DIST = 140;
+  const mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    w = canvas.width = hero.clientWidth;
+    h = canvas.height = hero.clientHeight;
+  }
+
+  function makeNodes() {
+    nodes = Array.from({ length: NODE_COUNT }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: 1.4 + Math.random() * 1.6,
+    }));
+  }
+
+  function step() {
+    ctx.clearRect(0, 0, w, h);
+    for (const n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > w) n.vx *= -1;
+      if (n.y < 0 || n.y > h) n.vy *= -1;
+      const dx = n.x - mouse.x, dy = n.y - mouse.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 120) { n.x += dx / d * 0.6; n.y += dy / d * 0.6; }
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (dist < LINK_DIST) {
+          ctx.strokeStyle = `rgba(156,74,60,${(1 - dist / LINK_DIST) * 0.3})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+    for (const n of nodes) {
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(156,74,60,0.6)';
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (!reduceMotion) requestAnimationFrame(step);
+  }
+
+  resize();
+  makeNodes();
+  step();
+  window.addEventListener('resize', () => { resize(); makeNodes(); if (reduceMotion) step(); });
+  hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  hero.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+</script>
+
+</body>
+</html>
